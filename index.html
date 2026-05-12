@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의코디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7F5F2; --surface:#FFFFFF; --surface2:#F0EDE8;
+    --text:#1A1A1A; --text2:#6B6760; --text3:#A8A49E;
+    --border:rgba(26,26,26,0.1); --border2:rgba(26,26,26,0.18);
+    --accent:#1A1A1A; --accent-text:#F7F5F2;
+    --top-color:#D4E8F0; --top-text:#1A4A5A;
+    --bottom-color:#D4EAD8; --bottom-text:#1A4A25;
+    --outer-color:#EDE8D4; --outer-text:#4A3A1A;
+    --acc-color:#EDD4E8; --acc-text:#4A1A44;
+    --radius:14px; --radius-sm:8px;
+    --shadow:0 1px 3px rgba(0,0,0,0.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;}
+
+  .layout{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;min-height:100vh;}
+  header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;background:var(--surface);border-bottom:1px solid var(--border);}
+  .logo{font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-.3px;display:flex;align-items:center;gap:10px;}
+  .logo-dot{width:8px;height:8px;background:var(--text);border-radius:50%;}
+  .header-temp{font-family:'DM Serif Display',serif;font-size:28px;letter-spacing:-1px;}
+  .header-temp sup{font-size:16px;vertical-align:10px;}
+  .header-desc{font-size:12px;color:var(--text2);text-align:right;}
+
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:28px 20px;display:flex;flex-direction:column;gap:4px;}
+  .nav-label{font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;padding:16px 12px 8px;}
+  .nav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:none;color:var(--text2);font-family:'Noto Sans KR',sans-serif;font-size:14px;border-radius:var(--radius-sm);cursor:pointer;text-align:left;transition:background .15s,color .15s;width:100%;}
+  .nav-btn svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.6;}
+  .nav-btn:hover{background:var(--surface2);color:var(--text);}
+  .nav-btn.active{background:var(--accent);color:var(--accent-text);}
+
+  main{padding:32px;overflow-y:auto;}
+  .view{display:none;animation:fadeUp .25s ease;}
+  .view.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  .view-title{font-family:'DM Serif Display',serif;font-size:28px;letter-spacing:-.5px;margin-bottom:4px;}
+  .view-subtitle{font-size:13px;color:var(--text2);margin-bottom:28px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);}
+  .card-title{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
+
+  .temp-slider-wrap{display:flex;align-items:center;gap:14px;margin:20px 0 0;}
+  .temp-slider-wrap label{font-size:13px;color:var(--text2);white-space:nowrap;}
+  input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border2);border-radius:2px;outline:none;cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--text);border-radius:50%;cursor:pointer;transition:transform .1s;}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+
+  .outfit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 16px;}
+  .outfit-item{background:var(--surface2);border-radius:var(--radius-sm);padding:18px 10px;text-align:center;transition:transform .15s;}
+  .outfit-item:hover{transform:translateY(-2px);}
+  .outfit-item svg{width:28px;height:28px;stroke:var(--text2);stroke-width:1.4;fill:none;display:block;margin:0 auto 8px;}
+  .outfit-item span{font-size:12px;color:var(--text2);line-height:1.3;}
+  .tip-box{display:flex;gap:10px;padding:14px 16px;background:var(--surface2);border-radius:var(--radius-sm);font-size:13px;color:var(--text2);margin-bottom:16px;}
+  .tip-box svg{width:16px;height:16px;flex-shrink:0;margin-top:2px;stroke:var(--text3);stroke-width:1.6;fill:none;}
+
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;font-family:'Noto Sans KR',sans-serif;font-size:14px;border-radius:var(--radius-sm);cursor:pointer;border:1px solid transparent;transition:opacity .15s,background .15s;}
+  .btn svg{width:16px;height:16px;stroke-width:1.8;fill:none;stroke:currentColor;}
+  .btn-primary{background:var(--text);color:var(--accent-text);border-color:var(--text);}
+  .btn-primary:hover{opacity:.8;}
+  .btn-secondary{background:transparent;color:var(--text);border-color:var(--border2);}
+  .btn-secondary:hover{background:var(--surface2);}
+  .btn-danger{background:transparent;color:#c0392b;border-color:rgba(192,57,43,.2);}
+  .btn-danger:hover{background:rgba(192,57,43,.06);}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .count-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+  .count-chip{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 12px;text-align:center;}
+  .count-chip .num{font-family:'DM Serif Display',serif;font-size:26px;}
+  .count-chip .lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+
+  .item-list{display:flex;flex-direction:column;}
+  .item-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .item-row:last-child{border-bottom:none;}
+
+  /* 사진 썸네일 */
+  .item-thumb{width:56px;height:56px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0;border:1px solid var(--border);cursor:pointer;}
+  .item-thumb-ph{width:56px;height:56px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;}
+  .item-thumb-ph svg{width:22px;height:22px;stroke:var(--text3);stroke-width:1.4;fill:none;}
+
+  .item-info{flex:1;min-width:0;cursor:pointer;}
+  .item-name{font-size:14px;font-weight:500;}
+  .item-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+  .item-care{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.5;}
+
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-right:4px;}
+  .badge-top{background:var(--top-color);color:var(--top-text);}
+  .badge-bottom{background:var(--bottom-color);color:var(--bottom-text);}
+  .badge-outer{background:var(--outer-color);color:var(--outer-text);}
+  .badge-acc{background:var(--acc-color);color:var(--acc-text);}
+  .badge-season{background:var(--surface2);color:var(--text2);}
+
+  .del-btn{background:none;border:none;cursor:pointer;padding:6px;color:var(--text3);border-radius:6px;transition:color .15s,background .15s;flex-shrink:0;}
+  .del-btn:hover{color:#c0392b;background:rgba(192,57,43,.06);}
+  .del-btn svg{width:16px;height:16px;stroke-width:1.8;fill:none;stroke:currentColor;display:block;}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group.full{grid-column:1/-1;}
+  label.form-label{font-size:12px;color:var(--text2);font-weight:500;}
+  input[type=text],select,textarea{padding:10px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:14px;outline:none;transition:border-color .15s;width:100%;}
+  input[type=text]:focus,select:focus,textarea:focus{border-color:var(--text);}
+  textarea{resize:vertical;min-height:80px;}
+
+  /* 사진 업로드 */
+  .upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:24px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+  .upload-zone:hover{border-color:var(--text);background:var(--surface2);}
+  .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .upload-zone svg{width:28px;height:28px;stroke:var(--text3);stroke-width:1.4;fill:none;display:block;margin:0 auto 8px;}
+  .upload-zone p{font-size:13px;color:var(--text2);}
+  .upload-zone small{font-size:11px;color:var(--text3);}
+  .preview-wrap{position:relative;margin-top:10px;}
+  .preview-img{width:100%;max-height:200px;object-fit:contain;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);}
+  .remove-btn{position:absolute;top:6px;right:6px;background:rgba(26,26,26,.7);border:none;border-radius:50%;width:26px;height:26px;color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+
+  /* 케어라벨 분석 */
+  .analysis-box{background:var(--surface2);border-radius:var(--radius-sm);padding:14px;font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap;min-height:60px;}
+  .analysis-status{font-size:12px;color:var(--text3);margin-bottom:6px;}
+  .pulsing{animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  .api-key-wrap{display:flex;gap:8px;align-items:center;}
+  .api-key-wrap input{flex:1;font-family:monospace;font-size:13px;}
+  .api-notice{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5;}
+
+  /* 추천 */
+  .rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+  .rec-item{background:var(--surface2);border-radius:var(--radius-sm);padding:16px 10px;text-align:center;}
+  .rec-photo{width:60px;height:60px;object-fit:cover;border-radius:var(--radius-sm);margin:0 auto 8px;display:block;border:1px solid var(--border);}
+  .rec-item svg{width:28px;height:28px;stroke:var(--text2);stroke-width:1.4;fill:none;display:block;margin:0 auto 8px;}
+  .rec-name{font-size:12px;font-weight:500;margin-bottom:2px;}
+  .rec-meta{font-size:11px;color:var(--text3);}
+
+  .empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
+  .empty-state svg{width:40px;height:40px;stroke:var(--border2);stroke-width:1.2;fill:none;display:block;margin:0 auto 12px;}
+  .empty-state p{font-size:14px;}
+
+  /* 사용방법 */
+  .help-step{display:flex;gap:18px;margin-bottom:28px;}
+  .step-num{font-family:'DM Serif Display',serif;font-size:32px;color:var(--border2);line-height:1;flex-shrink:0;width:32px;text-align:center;}
+  .step-content h3{font-size:15px;font-weight:500;margin-bottom:6px;}
+  .step-content p{font-size:13px;color:var(--text2);line-height:1.7;}
+  .h-divider{height:1px;background:var(--border);margin:24px 0;}
+  .sc-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .sc-row:last-child{border-bottom:none;}
+  .sc-key{background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:2px 8px;font-size:12px;color:var(--text2);font-family:monospace;}
+
+  /* 백업 */
+  .bk-section{margin-bottom:24px;}
+  .bk-section h3{font-size:14px;font-weight:500;margin-bottom:8px;}
+  .bk-section p{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6;}
+  .data-preview{background:var(--surface2);border-radius:var(--radius-sm);padding:14px;font-family:monospace;font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6;word-break:break-all;max-height:120px;overflow-y:auto;}
+
+  /* 토스트 */
+  #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--accent-text);padding:10px 20px;border-radius:30px;font-size:13px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:999;white-space:nowrap;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* 모달 */
+  .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;}
+  .modal-ov.open{display:flex;}
+  .modal{background:var(--surface);border-radius:var(--radius);padding:28px;max-width:520px;width:90%;max-height:90vh;overflow-y:auto;}
+  .modal-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:4px;}
+  .modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
+  .modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);margin-top:-4px;}
+
+  @media(max-width:700px){
+    .layout{grid-template-columns:1fr;grid-template-rows:auto auto 1fr;}
+    header{padding:14px 18px;}
+    .sidebar{border-right:none;border-bottom:1px solid var(--border);padding:10px;flex-direction:row;overflow-x:auto;gap:6px;}
+    .nav-label{display:none;}
+    .nav-btn{white-space:nowrap;padding:8px 12px;font-size:13px;}
+    main{padding:18px;}
+    .form-grid{grid-template-columns:1fr;}
+    .count-row{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- 케어라벨 분석 모달 -->
+<div class="modal-ov" id="careModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCare()">✕</button>
+    <div class="modal-title">케어라벨 AI 분석</div>
+    <div class="modal-sub">케어라벨 사진을 올리면 세탁 방법을 자동으로 읽어드려요</div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Anthropic API 키</label>
+      <div class="api-key-wrap">
+        <input type="password" id="apiKey" placeholder="sk-ant-...">
+        <button class="btn btn-secondary" onclick="toggleKey()" style="padding:10px 14px;font-size:12px">보기</button>
+      </div>
+      <div class="api-notice">키는 이 기기에만 임시 보관되며 외부로 전송되지 않아요.<br>console.anthropic.com 에서 발급받을 수 있어요.</div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">케어라벨 사진</label>
+      <div class="upload-zone" id="careZone" onclick="document.getElementById('careFile').click()">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <p>클릭하거나 드래그해서 업로드</p>
+        <small>JPG · PNG · WEBP · 최대 4MB</small>
+        <input type="file" id="careFile" accept="image/*" style="display:none" onchange="onCareFile(event)">
+      </div>
+      <div id="carePreviewWrap" style="display:none;margin-top:10px">
+        <img id="carePreview" class="preview-img" alt="케어라벨">
+      </div>
+    </div>
+
+    <div id="careResultWrap" style="display:none;margin-bottom:16px">
+      <div class="analysis-status" id="careStatus"></div>
+      <div class="analysis-box" id="careBox"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="runAnalysis()">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        분석 시작
+      </button>
+      <button class="btn btn-secondary" onclick="applyAnalysis()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        메모에 적용
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 상세보기 모달 -->
+<div class="modal-ov" id="detailModal">
+  <div class="modal"><button class="modal-close" onclick="closeDetail()">✕</button><div id="detailContent"></div></div>
+</div>
+
+<div class="layout">
+  <header>
+    <div class="logo"><span class="logo-dot"></span>오늘의코디</div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div>
+        <div class="header-temp" id="headerTemp">--<sup>°</sup></div>
+        <div class="header-desc" id="headerDesc">기온을 설정해 주세요</div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <span class="nav-label">메뉴</span>
+    <button class="nav-btn active" onclick="showView('today')" id="nav-today">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      오늘의 코디
+    </button>
+    <button class="nav-btn" onclick="showView('wardrobe')" id="nav-wardrobe">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M3 6h18M3 12h18"/></svg>
+      내 옷장
+    </button>
+    <button class="nav-btn" onclick="showView('add')" id="nav-add">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+      옷 등록
+    </button>
+    <button class="nav-btn" onclick="showView('recommend')" id="nav-recommend">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      맞춤 추천
+    </button>
+    <span class="nav-label" style="margin-top:8px">데이터</span>
+    <button class="nav-btn" onclick="showView('backup')" id="nav-backup">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      백업 / 불러오기
+    </button>
+    <span class="nav-label" style="margin-top:8px">도움말</span>
+    <button class="nav-btn" onclick="showView('help')" id="nav-help">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      사용 방법
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ① 오늘의 코디 -->
+    <div class="view active" id="view-today">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+        <div>
+          <div style="font-family:'DM Serif Display',serif;font-size:80px;line-height:1;letter-spacing:-4px" id="todayBig">--<sup style="font-size:36px;vertical-align:28px">°</sup></div>
+          <div style="font-size:13px;color:var(--text2)" id="todayDesc">기온을 설정해 주세요</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="todayZone"></div>
+        </div>
+        <div style="min-width:240px;flex:1">
+          <div class="temp-slider-wrap">
+            <label>기온 조절</label>
+            <input type="range" id="mainSlider" min="-5" max="35" value="18" step="1" oninput="onSlider()">
+            <span style="font-size:14px;font-weight:500;min-width:40px;text-align:right"><span id="sliderVal">18</span>°C</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="card-title" id="todayCat">오늘의 코디</div>
+          <div style="font-size:12px;color:var(--text3)" id="shuffleInfo"></div>
+        </div>
+        <div class="outfit-grid" id="outfitGrid"></div>
+        <div class="tip-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="tipText"></span></div>
+        <button class="btn btn-primary" onclick="shuffle()">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          다른 코디 보기
+        </button>
+      </div>
+    </div>
+
+    <!-- ② 내 옷장 -->
+    <div class="view" id="view-wardrobe">
+      <div class="view-title">내 옷장</div>
+      <div class="view-subtitle" id="wardSub">등록된 옷을 확인하고 관리해요</div>
+      <div class="count-row" id="countRow"></div>
+      <div class="card"><div class="item-list" id="itemList"></div></div>
+    </div>
+
+    <!-- ③ 옷 등록 -->
+    <div class="view" id="view-add">
+      <div class="view-title">옷 등록</div>
+      <div class="view-subtitle">사진과 함께 새 옷을 옷장에 추가해요</div>
+      <div class="card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">카테고리</label>
+            <select id="fCat"><option value="top">상의</option><option value="bottom">하의</option><option value="outer">외투</option><option value="acc">악세사리</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">적합한 계절</label>
+            <select id="fSeason"><option value="summer">여름 (23°C+)</option><option value="spring">봄·가을 (12~22°C)</option><option value="winter">겨울 (11°C 이하)</option><option value="all">사계절</option></select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">옷 이름</label>
+            <input type="text" id="fName" placeholder="예: 흰 오버핏 티셔츠" maxlength="40">
+          </div>
+
+          <!-- 옷 사진 -->
+          <div class="form-group full">
+            <label class="form-label">옷 사진 <span style="color:var(--text3);font-weight:400">(선택 · 브라우저에 저장)</span></label>
+            <div class="upload-zone" id="clothZone" onclick="document.getElementById('clothFile').click()">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <p>옷 사진을 클릭하거나 드래그해서 업로드</p>
+              <small>JPG · PNG · WEBP · 최대 4MB</small>
+              <input type="file" id="clothFile" accept="image/*" style="display:none" onchange="onClothFile(event)">
+            </div>
+            <div id="clothPreviewWrap" style="display:none">
+              <div class="preview-wrap">
+                <img id="clothPreview" class="preview-img" alt="옷 사진">
+                <button class="remove-btn" onclick="removeCloth()">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 케어라벨 -->
+          <div class="form-group full">
+            <label class="form-label">케어라벨 <span style="color:var(--text3);font-weight:400">(선택 · AI 자동 분석)</span></label>
+            <button class="btn btn-secondary" onclick="openCare()" style="align-self:flex-start">
+              <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+              AI로 케어라벨 읽기
+            </button>
+            <div id="careApplied" style="display:none;margin-top:8px">
+              <div class="analysis-box" id="careAppliedBox" style="font-size:12px"></div>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">메모 / 세탁 방법</label>
+            <textarea id="fNote" placeholder="색상, 브랜드, 세탁법 등 자유롭게 적어요" maxlength="300"></textarea>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" onclick="addItem()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            옷장에 추가
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 맞춤 추천 -->
+    <div class="view" id="view-recommend">
+      <div class="view-title">맞춤 추천</div>
+      <div class="view-subtitle">내 옷장 기반으로 오늘의 조합을 추천해 드려요</div>
+      <div class="card">
+        <div class="card-title">기온 설정</div>
+        <div class="temp-slider-wrap" style="margin-bottom:8px">
+          <label>기온</label>
+          <input type="range" id="recSlider" min="-5" max="35" value="18" step="1" oninput="onRecSlider()">
+          <span style="font-size:14px;font-weight:500;min-width:40px;text-align:right"><span id="recVal">18</span>°C</span>
+        </div>
+        <div style="font-size:12px;color:var(--text3)" id="recZone"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">내 옷장에서 고른 조합</div>
+        <div id="recResult"></div>
+        <div style="margin-top:14px">
+          <button class="btn btn-secondary" onclick="renderRec()">
+            <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            다시 추천받기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ 백업 -->
+    <div class="view" id="view-backup">
+      <div class="view-title">백업 / 불러오기</div>
+      <div class="view-subtitle">옷장 데이터를 저장하거나 복원해요</div>
+      <div class="card">
+        <div class="bk-section">
+          <h3>💾 JSON 파일로 백업</h3>
+          <p>현재 옷장 데이터를 JSON 파일로 내보냅니다. 사진도 포함되므로 파일이 클 수 있어요.</p>
+          <div class="data-preview" id="dataPreview">—</div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="exportData()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>JSON 내보내기</button>
+            <button class="btn btn-secondary" onclick="copyData()"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>클립보드 복사</button>
+          </div>
+        </div>
+        <div class="h-divider"></div>
+        <div class="bk-section">
+          <h3>📂 JSON 파일 불러오기</h3>
+          <p>이전에 백업한 파일을 선택하면 복원됩니다. <strong style="color:var(--text)">기존 데이터는 덮어쓰여집니다.</strong></p>
+          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>파일 선택</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        </div>
+        <div class="h-divider"></div>
+        <div class="bk-section">
+          <h3>🗑 데이터 초기화</h3>
+          <p>모든 옷장 데이터를 삭제합니다. 되돌릴 수 없습니다.</p>
+          <button class="btn btn-danger" onclick="clearData()"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>전체 초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ 사용방법 -->
+    <div class="view" id="view-help">
+      <div class="view-title">사용 방법</div>
+      <div class="view-subtitle">오늘의코디를 200% 활용하는 방법</div>
+      <div class="card">
+        <div class="help-step"><div class="step-num">1</div><div class="step-content"><h3>기온을 설정해요</h3><p>「오늘의 코디」 화면에서 슬라이더로 기온을 맞춰주세요. -5°C ~ 35°C, 8개 구간에 따라 코디 세트가 자동으로 바뀝니다.</p></div></div>
+        <div class="help-step"><div class="step-num">2</div><div class="step-content"><h3>코디를 확인해요</h3><p>각 구간마다 3가지 조합이 준비되어 있어요. 「다른 코디 보기」로 같은 기온대의 다른 조합을 볼 수 있어요.</p></div></div>
+        <div class="help-step"><div class="step-num">3</div><div class="step-content"><h3>옷 사진을 등록해요</h3><p>「옷 등록」에서 옷 사진을 업로드할 수 있어요. 사진은 브라우저(localStorage)에 저장되며 서버로 전송되지 않아요. 옷 목록과 맞춤 추천에서 사진으로 표시됩니다.</p></div></div>
+        <div class="help-step"><div class="step-num">4</div><div class="step-content"><h3>AI로 케어라벨을 분석해요</h3><p>「AI로 케어라벨 읽기」를 누르고 Anthropic API 키와 케어라벨 사진을 올리면 세탁 방법을 자동으로 분석해 메모에 넣어줘요. API 키는 console.anthropic.com에서 무료로 발급받을 수 있어요.</p></div></div>
+        <div class="help-step"><div class="step-num">5</div><div class="step-content"><h3>맞춤 추천을 받아요</h3><p>「맞춤 추천」에서 내 옷장 기반으로 기온에 맞는 코디를 추천받아요. 사진이 등록된 옷은 사진으로 표시됩니다.</p></div></div>
+        <div class="help-step"><div class="step-num">6</div><div class="step-content"><h3>데이터를 백업해요</h3><p>「백업 / 불러오기」에서 옷장 데이터를 JSON 파일로 저장할 수 있어요. 기기가 바뀌어도 파일만 있으면 바로 복원할 수 있어요.</p></div></div>
+        <div class="h-divider"></div>
+        <div class="card-title">기온별 코디 구간</div>
+        <div style="font-size:13px;color:var(--text2)">
+          <div class="sc-row"><span>28°C 이상</span><span class="sc-key">한여름 — 반팔, 샌들</span></div>
+          <div class="sc-row"><span>23 ~ 27°C</span><span class="sc-key">초여름 — 반팔 셔츠, 로퍼</span></div>
+          <div class="sc-row"><span>20 ~ 22°C</span><span class="sc-key">봄·가을 — 긴팔, 스니커즈</span></div>
+          <div class="sc-row"><span>17 ~ 19°C</span><span class="sc-key">봄·가을 — 가디건, 데님</span></div>
+          <div class="sc-row"><span>12 ~ 16°C</span><span class="sc-key">환절기 — 자켓, 트렌치코트</span></div>
+          <div class="sc-row"><span>9 ~ 11°C</span><span class="sc-key">초겨울 — 코트, 레이어드</span></div>
+          <div class="sc-row"><span>5 ~ 8°C</span><span class="sc-key">겨울 — 울 코트, 히트텍</span></div>
+          <div class="sc-row"><span>4°C 이하</span><span class="sc-key">한겨울 — 패딩, 기모</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const SK='odyk_v2';
+const ZONES=[
+  {r:'28°C 이상',l:'한여름',min:28,max:99,combos:[{c:'캐주얼',i:[{t:'shirt',n:'반팔 티셔츠'},{t:'pants',n:'린넨 팬츠'},{t:'shoe',n:'샌들'}]},{c:'시티 캐주얼',i:[{t:'shirt',n:'민소매 탑'},{t:'pants',n:'면 쇼츠'},{t:'shoe',n:'슬리퍼'}]},{c:'스트릿',i:[{t:'shirt',n:'크롭 티셔츠'},{t:'pants',n:'와이드 팬츠'},{t:'shoe',n:'스니커즈'}]}],tip:'자외선이 강합니다. 선크림과 선글라스를 챙기세요.'},
+  {r:'23~27°C',l:'초여름',min:23,max:27,combos:[{c:'캐주얼',i:[{t:'shirt',n:'반팔 셔츠'},{t:'pants',n:'면바지'},{t:'shoe',n:'로퍼'}]},{c:'시티룩',i:[{t:'shirt',n:'린넨 셔츠'},{t:'pants',n:'슬랙스'},{t:'shoe',n:'스니커즈'}]},{c:'스트릿',i:[{t:'shirt',n:'그래픽 티'},{t:'pants',n:'카고 팬츠'},{t:'shoe',n:'샌들'}]}],tip:'저녁엔 약간 쌀쌀할 수 있어요. 얇은 겉옷을 챙기면 좋아요.'},
+  {r:'20~22°C',l:'봄·가을',min:20,max:22,combos:[{c:'캐주얼',i:[{t:'shirt',n:'긴팔 티셔츠'},{t:'pants',n:'슬랙스'},{t:'shoe',n:'스니커즈'}]},{c:'미니멀룩',i:[{t:'shirt',n:'베이직 롱슬리브'},{t:'pants',n:'데님 팬츠'},{t:'shoe',n:'로퍼'}]},{c:'시티',i:[{t:'shirt',n:'스트라이프 셔츠'},{t:'pants',n:'면 팬츠'},{t:'shoe',n:'캔버스화'}]}],tip:'단품 하나로 충분한 날씨예요. 레이어드 없이 깔끔하게!'},
+  {r:'17~19°C',l:'봄·가을',min:17,max:19,combos:[{c:'캐주얼',i:[{t:'outer',n:'가디건'},{t:'pants',n:'데님 팬츠'},{t:'shoe',n:'스니커즈'}]},{c:'레이어드',i:[{t:'shirt',n:'셔츠+니트'},{t:'pants',n:'슬랙스'},{t:'shoe',n:'로퍼'}]},{c:'스트릿',i:[{t:'shirt',n:'후드티'},{t:'pants',n:'조거 팬츠'},{t:'shoe',n:'스니커즈'}]}],tip:'아침저녁으로 쌀쌀합니다. 얇은 가디건을 꼭 챙기세요.'},
+  {r:'12~16°C',l:'환절기',min:12,max:16,combos:[{c:'클래식',i:[{t:'outer',n:'트렌치코트'},{t:'shirt',n:'니트'},{t:'pants',n:'슬랙스'}]},{c:'캐주얼',i:[{t:'outer',n:'자켓'},{t:'shirt',n:'긴팔 티'},{t:'pants',n:'데님'}]},{c:'미니멀',i:[{t:'outer',n:'오버사이즈 자켓'},{t:'shirt',n:'베이직 셔츠'},{t:'pants',n:'슬랙스'}]}],tip:'저녁엔 꽤 춥습니다. 겉옷은 필수예요.'},
+  {r:'9~11°C',l:'초겨울',min:9,max:11,combos:[{c:'레이어드',i:[{t:'outer',n:'코트'},{t:'shirt',n:'자켓 레이어'},{t:'pants',n:'슬랙스'}]},{c:'캐주얼',i:[{t:'outer',n:'롱 코트'},{t:'shirt',n:'터틀넥'},{t:'pants',n:'스키니'}]},{c:'스트릿',i:[{t:'outer',n:'후드 집업'},{t:'shirt',n:'두꺼운 니트'},{t:'pants',n:'조거'}]}],tip:'두꺼운 겉옷이 필요합니다. 레이어드를 활용해 보세요.'},
+  {r:'5~8°C',l:'겨울',min:5,max:8,combos:[{c:'클래식',i:[{t:'outer',n:'울 코트'},{t:'shirt',n:'두꺼운 니트'},{t:'pants',n:'히트텍'}]},{c:'캐주얼',i:[{t:'outer',n:'패딩 조끼'},{t:'shirt',n:'기모 후드티'},{t:'pants',n:'두꺼운 슬랙스'}]},{c:'미니멀',i:[{t:'outer',n:'오버코트'},{t:'shirt',n:'터틀넥 니트'},{t:'pants',n:'두꺼운 데님'}]}],tip:'히트텍·내복을 꼭 입으세요. 목도리와 장갑도 챙기세요.'},
+  {r:'4°C 이하',l:'한겨울',min:-99,max:4,combos:[{c:'방한',i:[{t:'outer',n:'롱 패딩'},{t:'shirt',n:'기모 니트'},{t:'acc',n:'목도리'}]},{c:'클래식 방한',i:[{t:'outer',n:'헤비 울 코트'},{t:'shirt',n:'패딩 조끼 레이어'},{t:'pants',n:'기모 팬츠'}]},{c:'스트릿 방한',i:[{t:'outer',n:'숏 패딩'},{t:'shirt',n:'기모 후드'},{t:'pants',n:'기모 조거'}]}],tip:'최대한 겹쳐 입으세요. 히트텍 상하의는 기본입니다.'},
+];
+
+const ICONS={
+  shirt:'<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.4" width="28" height="28"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.33-2.23z"/></svg>',
+  pants:'<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.4" width="28" height="28"><path d="M6 2h12l2 8-4 12H8L4 10z"/><line x1="12" y1="2" x2="12" y2="22"/></svg>',
+  outer:'<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.4" width="28" height="28"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.33-2.23z"/><line x1="12" y1="2" x2="12" y2="10"/></svg>',
+  shoe:'<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.4" width="28" height="28"><path d="M2 18l4-12h3l3 8h2l2-4h3l3 6a2 2 0 01-2 2H4a2 2 0 01-2-2z"/></svg>',
+  acc:'<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.4" width="28" height="28"><circle cx="12" cy="12" r="3"/><path d="M6.343 17.657l-1.414 1.414M4.929 4.929l1.414 1.414M17.657 6.343l1.414-1.414M18.364 18.364l1.414 1.414M2 12h2M20 12h2M12 2v2M12 20v2"/></svg>',
+};
+
+const CAT={top:{lb:'상의',b:'top'},bottom:{lb:'하의',b:'bottom'},outer:{lb:'외투',b:'outer'},acc:{lb:'악세사리',b:'acc'}};
+const SEA={summer:'여름',spring:'봄·가을',winter:'겨울',all:'사계절'};
+
+let items=load();
+let cTemp=18,cZone=0,cCombo=0,rTemp=18;
+let clothB64=null,careB64=null,careText='';
+
+function load(){try{return JSON.parse(localStorage.getItem(SK))||[];}catch{return[];}}
+function save(){localStorage.setItem(SK,JSON.stringify(items));}
+function zoneOf(t){for(let i=0;i<ZONES.length;i++)if(t>=ZONES[i].min&&t<=ZONES[i].max)return i;return ZONES.length-1;}
+function desc(t){if(t>=28)return'무더운 날씨예요 — 최대한 가볍게!';if(t>=23)return'포근한 날씨예요';if(t>=20)return'산책하기 딱 좋은 날씨';if(t>=17)return'약간 쌀쌀한 봄가을 날씨';if(t>=12)return'겉옷이 필요한 날씨예요';if(t>=9)return'꽤 쌀쌀합니다';if(t>=5)return'추운 날씨, 따뜻하게 입으세요';return'한겨울 날씨예요 — 꽁꽁 싸매세요';}
+function sea(t){if(t>=23)return'summer';if(t>=12)return'spring';return'winter';}
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2400);}
+
+function showView(n){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+n).classList.add('active');
+  document.getElementById('nav-'+n).classList.add('active');
+  if(n==='wardrobe')renderWard();
+  if(n==='recommend')renderRec();
+  if(n==='backup')renderBk();
+}
+
+/* 오늘의 코디 */
+function onSlider(){
+  const v=parseInt(document.getElementById('mainSlider').value);
+  document.getElementById('sliderVal').textContent=v;
+  const nz=zoneOf(v);if(nz!==cZone){cZone=nz;cCombo=0;}
+  cTemp=v;renderToday();
+}
+function renderToday(){
+  const z=ZONES[cZone],cb=z.combos[cCombo];
+  document.getElementById('todayBig').innerHTML=cTemp+'<sup style="font-size:36px;vertical-align:28px">°</sup>';
+  document.getElementById('todayDesc').textContent=desc(cTemp);
+  document.getElementById('todayZone').textContent='코디 구간: '+z.r+' · '+z.l;
+  document.getElementById('headerTemp').innerHTML=cTemp+'<sup>°</sup>';
+  document.getElementById('headerDesc').textContent=desc(cTemp).split('—')[0].trim();
+  document.getElementById('todayCat').textContent=cb.c+' 코디';
+  document.getElementById('shuffleInfo').textContent=(cCombo+1)+' / '+z.combos.length;
+  document.getElementById('tipText').textContent=z.tip;
+  document.getElementById('outfitGrid').innerHTML=cb.i.map(x=>`<div class="outfit-item">${ICONS[x.t]||ICONS.shirt}<span>${x.n}</span></div>`).join('');
+}
+function shuffle(){cCombo=(cCombo+1)%ZONES[cZone].combos.length;renderToday();}
+
+/* 내 옷장 */
+function renderWard(){
+  const total=items.length;
+  const c=['top','bottom','outer','acc'].map(x=>items.filter(i=>i.cat===x).length);
+  document.getElementById('wardSub').textContent='총 '+total+'개의 옷이 등록되어 있어요';
+  document.getElementById('countRow').innerHTML=
+    `<div class="count-chip"><div class="num">${total}</div><div class="lbl">전체</div></div>`+
+    `<div class="count-chip"><div class="num">${c[0]}</div><div class="lbl">상의</div></div>`+
+    `<div class="count-chip"><div class="num">${c[1]}</div><div class="lbl">하의</div></div>`+
+    `<div class="count-chip"><div class="num">${c[2]+c[3]}</div><div class="lbl">외투·기타</div></div>`;
+  const list=document.getElementById('itemList');
+  if(!items.length){list.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.2" width="40" height="40"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.33-2.23z"/></svg><p>아직 등록된 옷이 없어요.<br>옷 등록 메뉴에서 추가해 보세요.</p></div>';return;}
+  list.innerHTML=items.map(it=>{
+    const m=CAT[it.cat]||CAT.top;
+    const thumb=it.photo
+      ?`<img class="item-thumb" src="${it.photo}" alt="${it.name}" onclick="openDetail('${it.id}')">`
+      :`<div class="item-thumb-ph" onclick="openDetail('${it.id}')">${ICONS[it.cat==='bottom'?'pants':it.cat==='outer'?'outer':it.cat==='acc'?'acc':'shirt']}</div>`;
+    return`<div class="item-row">${thumb}
+      <div class="item-info" onclick="openDetail('${it.id}')">
+        <div class="item-name">${it.name}</div>
+        <div class="item-meta"><span class="badge badge-${m.b}">${m.lb}</span><span class="badge badge-season">${SEA[it.sea]||it.sea}</span></div>
+        ${it.note?`<div class="item-care">${it.note.slice(0,60)}${it.note.length>60?'…':''}</div>`:''}
+      </div>
+      <button class="del-btn" onclick="delItem('${it.id}')" aria-label="삭제"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+    </div>`;
+  }).join('');
+}
+
+/* 상세보기 */
+function openDetail(id){
+  const it=items.find(i=>i.id===id);if(!it)return;
+  const m=CAT[it.cat]||CAT.top;
+  document.getElementById('detailContent').innerHTML=`
+    <div class="modal-title">${it.name}</div>
+    <div style="margin-bottom:16px"><span class="badge badge-${m.b}">${m.lb}</span><span class="badge badge-season">${SEA[it.sea]||it.sea}</span></div>
+    ${it.photo?`<img src="${it.photo}" style="width:100%;max-height:300px;object-fit:contain;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:16px;background:var(--surface2)">`:''}
+    ${it.note?`<div style="font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap;background:var(--surface2);border-radius:var(--radius-sm);padding:14px">${it.note}</div>`:'<div style="font-size:13px;color:var(--text3)">메모 없음</div>'}`;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeDetail(){document.getElementById('detailModal').classList.remove('open');}
+
+/* 옷 사진 */
+function onClothFile(e){
+  const f=e.target.files[0];if(!f)return;
+  if(f.size>4*1024*1024){toast('4MB 이하 사진만 가능해요.');return;}
+  const r=new FileReader();
+  r.onload=ev=>{clothB64=ev.target.result;document.getElementById('clothPreview').src=clothB64;document.getElementById('clothPreviewWrap').style.display='block';document.getElementById('clothZone').style.display='none';};
+  r.readAsDataURL(f);
+}
+function removeCloth(){clothB64=null;document.getElementById('clothPreviewWrap').style.display='none';document.getElementById('clothZone').style.display='block';document.getElementById('clothFile').value='';}
+
+/* 케어라벨 모달 */
+function openCare(){document.getElementById('careModal').classList.add('open');}
+function closeCare(){document.getElementById('careModal').classList.remove('open');}
+function toggleKey(){const i=document.getElementById('apiKey');i.type=i.type==='password'?'text':'password';}
+
+function onCareFile(e){
+  const f=e.target.files[0];if(!f)return;
+  if(f.size>4*1024*1024){toast('4MB 이하 사진만 가능해요.');return;}
+  const r=new FileReader();
+  r.onload=ev=>{careB64=ev.target.result;document.getElementById('carePreview').src=careB64;document.getElementById('carePreviewWrap').style.display='block';document.getElementById('careZone').style.display='none';};
+  r.readAsDataURL(f);
+}
+
+async function runAnalysis(){
+  const key=document.getElementById('apiKey').value.trim();
+  if(!key){toast('API 키를 입력해 주세요.');return;}
+  if(!careB64){toast('케어라벨 사진을 먼저 올려주세요.');return;}
+  const rw=document.getElementById('careResultWrap'),st=document.getElementById('careStatus'),bx=document.getElementById('careBox');
+  rw.style.display='block';st.className='analysis-status pulsing';st.textContent='AI가 케어라벨을 분석하고 있어요…';bx.textContent='';
+  const b64=careB64.split(',')[1],mt=careB64.split(';')[0].split(':')[1];
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mt,data:b64}},
+        {type:'text',text:'이 케어라벨 이미지를 분석해서 세탁 방법을 한국어로 간결하게 알려주세요. 아래 형식으로 답변해 주세요:\n\n세탁: (손세탁/세탁기 가능 여부, 온도)\n건조: (건조기 가능 여부, 건조 방법)\n다림질: (가능 여부, 온도)\n드라이클리닝: (가능 여부)\n주의사항: (기타 주의할 점)\n\n라벨이 없거나 읽기 어려우면 그 사실을 알려주세요.'}
+      ]}]})
+    });
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'API 오류');}
+    const data=await res.json();
+    careText=data.content[0].text;
+    st.className='analysis-status';st.textContent='분석 완료 ✓';bx.textContent=careText;
+  }catch(err){
+    st.className='analysis-status';st.textContent='분석 실패';bx.textContent=err.message;careText='';
+  }
+}
+
+function applyAnalysis(){
+  if(!careText){toast('먼저 분석을 완료해 주세요.');return;}
+  const n=document.getElementById('fNote');n.value=(n.value?n.value+'\n\n':'')+careText;
+  document.getElementById('careAppliedBox').textContent=careText;
+  document.getElementById('careApplied').style.display='block';
+  closeCare();toast('케어라벨 분석 결과를 메모에 적용했어요.');
+}
+
+/* 옷 추가 / 삭제 */
+function addItem(){
+  const name=document.getElementById('fName').value.trim();
+  if(!name){document.getElementById('fName').focus();toast('옷 이름을 입력해 주세요.');return;}
+  items.push({id:Date.now().toString(),name,cat:document.getElementById('fCat').value,sea:document.getElementById('fSeason').value,note:document.getElementById('fNote').value.trim(),photo:clothB64||null});
+  save();
+  document.getElementById('fName').value='';document.getElementById('fNote').value='';
+  document.getElementById('careApplied').style.display='none';
+  removeCloth();careText='';careB64=null;
+  document.getElementById('careResultWrap').style.display='none';
+  document.getElementById('carePreviewWrap').style.display='none';
+  document.getElementById('careZone').style.display='block';
+  document.getElementById('careFile').value='';
+  toast('옷장에 추가했어요!');showView('wardrobe');
+}
+function delItem(id){if(!confirm('이 옷을 삭제할까요?'))return;items=items.filter(i=>i.id!==id);save();renderWard();toast('삭제했어요.');}
+
+/* 맞춤 추천 */
+function onRecSlider(){rTemp=parseInt(document.getElementById('recSlider').value);document.getElementById('recVal').textContent=rTemp;renderRec();}
+function renderRec(){
+  const z=ZONES[zoneOf(rTemp)];document.getElementById('recZone').textContent='코디 구간: '+z.r+' · '+z.l;
+  const s=sea(rTemp),m=items.filter(i=>i.sea===s||i.sea==='all');
+  const tops=m.filter(i=>i.cat==='top'),bots=m.filter(i=>i.cat==='bottom'),outs=m.filter(i=>i.cat==='outer');
+  const pick=a=>a.length?a[Math.floor(Math.random()*a.length)]:null;
+  const t=pick(tops),b=pick(bots),o=pick(outs);
+  const res=document.getElementById('recResult');
+  if(!t&&!b){res.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.2" width="40" height="40"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><p>이 날씨에 맞는 옷이 부족해요.<br>옷 등록 메뉴에서 더 추가해 보세요.</p></div>';return;}
+  const card=(it,ic)=>it?`<div class="rec-item">${it.photo?`<img class="rec-photo" src="${it.photo}" alt="${it.name}">`:ICONS[ic]||ICONS.shirt}<div class="rec-name">${it.name}</div><div class="rec-meta">${SEA[it.sea]||it.sea}</div></div>`:`<div class="rec-item" style="opacity:.3">${ICONS[ic]||ICONS.shirt}<div class="rec-name">없음</div></div>`;
+  res.innerHTML=`<div class="rec-grid">${card(t,'shirt')}${card(b,'pants')}${card(o,'outer')}</div>`;
+}
+
+/* 백업 */
+function getEx(){return JSON.stringify({version:2,exportedAt:new Date().toISOString(),items},null,2);}
+function renderBk(){const raw=getEx();document.getElementById('dataPreview').textContent=items.length?(raw.slice(0,400)+(raw.length>400?'\n…':'')):' (등록된 옷이 없습니다)';}
+function exportData(){const b=new Blob([getEx()],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='오늘의코디_백업_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u);toast('백업 파일을 저장했어요.');}
+function copyData(){navigator.clipboard.writeText(getEx()).then(()=>toast('클립보드에 복사했어요.')).catch(()=>toast('복사에 실패했어요.'));}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{
+    try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d.items))throw 0;if(!confirm(d.items.length+'개의 데이터를 불러올까요?\n기존 데이터는 덮어쓰여집니다.'))return;items=d.items;save();renderBk();toast(items.length+'개의 옷 데이터를 불러왔어요.');}
+    catch{toast('올바른 백업 파일이 아니에요.');}
+  };r.readAsText(f);e.target.value='';
+}
+function clearData(){if(!confirm('정말 모든 데이터를 삭제할까요?\n이 작업은 되돌릴 수 없습니다.'))return;items=[];save();renderBk();toast('초기화했어요.');}
+
+/* 모달 바깥 클릭 */
+document.getElementById('careModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCare();});
+document.getElementById('detailModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeDetail();});
+
+/* 초기화 */
+cZone=zoneOf(cTemp);
+document.getElementById('mainSlider').value=cTemp;document.getElementById('sliderVal').textContent=cTemp;
+document.getElementById('recSlider').value=rTemp;document.getElementById('recVal').textContent=rTemp;
+document.getElementById('recZone').textContent='코디 구간: '+ZONES[zoneOf(rTemp)].r+' · '+ZONES[zoneOf(rTemp)].l;
+renderToday();renderWard();
+</script>
+</body>
+</html>
