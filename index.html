@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>오늘의코디</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👗</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="오늘의코디">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F7F5F2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
@@ -675,6 +681,19 @@ function clearData(){if(!confirm('정말 모든 데이터를 삭제할까요?\n�
 /* 모달 바깥 클릭 */
 document.getElementById('careModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCare();});
 document.getElementById('detailModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeDetail();});
+
+/* apple-touch-icon 동적 생성 */
+(function(){
+  try {
+    const c=document.createElement('canvas');c.width=180;c.height=180;
+    const ctx=c.getContext('2d');
+    ctx.fillStyle='#F7F5F2';
+    const r=22;ctx.beginPath();ctx.moveTo(r,0);ctx.lineTo(180-r,0);ctx.quadraticCurveTo(180,0,180,r);ctx.lineTo(180,180-r);ctx.quadraticCurveTo(180,180,180-r,180);ctx.lineTo(r,180);ctx.quadraticCurveTo(0,180,0,180-r);ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();ctx.fill();
+    ctx.font='120px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('👗',90,95);
+    const link=document.createElement('link');link.rel='apple-touch-icon';link.href=c.toDataURL('image/png');
+    document.head.appendChild(link);
+  } catch(e){}
+})();
 
 /* 초기화 */
 cZone=zoneOf(cTemp);
